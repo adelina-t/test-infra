@@ -149,6 +149,11 @@ func (az azure) createCluster() error {
 }
 
 func (az azure) Up() error {
+	err := helpers.ParseArgs()
+	if err != nil {
+		return fmt.Errorf("cannot parse args: %v", err)
+	}
+
 	ctx := context.Background()
 	err := az.createResourceGroup(ctx)
 
