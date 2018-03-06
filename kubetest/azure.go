@@ -4,10 +4,17 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"time"
 
 	"github.com/Azure-Samples/azure-sdk-for-go-samples/resources"
+	"github.com/azure-sdk-for-go-samples/helpers"
+	"github.com/azure-sdk-for-go-samples/iam"
+	"github.com/azure-sdk-for-go/profiles/latest/containerservice/mgmt/containerservice"
+	"github.com/go-autorest/autorest"
+	"github.com/go-autorest/autorest/to"
 )
 
 var (
@@ -48,8 +55,89 @@ func (az azure) createResourceGroup(ctx context.Context) error {
 	return nil
 }
 
+func getACSClient() (containerservice.ContainerServicesClient, error) {
+	token, err := iam.GetResourceManagementToken(iam.AuthGrantType())
+	if err != nil {
+		return containerservice.ContainerServicesClient{}, fmt.Errorf("cannot get token: %v", err)
+	}
+
+	acsClient := containerservice.NewContainerServicesClient(helpers.SubscriptionID())
+	acsClient.Authorizer = autorest.NewBearerAuthorizer(token)
+	acsClient.AddToUserAgent(helpers.UserAgent())
+	return acsClient, nil
+}
+
 func (az azure) createCluster() error {
 	fmt.Printf("CREATING CLUSTER")
+
+	var sshKeyData string
+	if _, err = os.Stat(sshPublicKeyPath); err == nil {
+		sshBytes, err := ioutil.ReadFile(az.sshPublicKeyPath)
+		if err != nil {
+			log.Fatalf("failed to read SSH key data: %v", err)
+		}
+		sshKeyData = string(sshBytes)
+	}
+
+	acsClient, err := getACSClient()
+	if err != nil {
+		return c, fmt.Errorf("cannot get ACS client: %v", err)
+	}
+
+	future, err := acsClient.CreateOrUpdate(
+		ctx,
+		az.resourceGroupName,
+		az.resourceName,
+		containerservice.ContainerService{
+			Name:     &az.resourceName,
+			Location: &az.location,
+			Properties: &containerservice.Properties{
+				OrchestratorProfile: &containerservice.OrchestratorProfileType{
+					OrchestratorType: containerservice.Kubernetes,
+				},
+				MasterProfile: &containerservice.MasterProfile{
+					VMSize:    containerservice.StandardD2sV3,
+					DNSPrefix: to.StringPtr(az.dnsPrefixMaster),
+				},
+				LinuxProfile: &containerservice.LinuxProfile{
+					AdminUsername: to.StringPtr(az.adminUsername),
+					SSH: &containerservice.SSHConfiguration{
+						PublicKeys: &[]containerservice.SSHPublicKey{
+							{
+								KeyData: to.StringPtr(sshKeyData),
+							},
+						},
+					},
+				},
+				AgentPoolProfiles: &[]containerservice.AgentPoolProfile{
+					{
+						Count:     to.Int32Ptr(az.agentPoolCount),
+						Name:      to.StringPtr("agentpool1"),
+						VMSize:    containerservice.StandardD2sV3,
+						OsType:    containerservice.Windows,
+						DNSPrefix: to.StringPtr(az.dnsPrefixAgent),
+					},
+				},
+				WindowsProfile: &containerservice.WindowsProfile{
+					AdminUsername: to.StringPtr(az.adminUsername),
+					AdminPassword: to.StringPtr(az.adminPassword),
+				},
+				ServicePrincipalProfile: &containerservice.ServicePrincipalProfile{
+					ClientID: to.StringPtr(az.clientID),
+					Secret:   to.StringPtr(az.clientSecret),
+				},
+			},
+		},
+	)
+	if err != nil {
+		return c, fmt.Errorf("cannot create AKS cluster: %v", err)
+	}
+
+	err = future.WaitForCompletion(ctx, aksClient.Client)
+	if err != nil {
+		return c, fmt.Errorf("cannot get the AKS cluster create or update future response: %v", err)
+	}
+
 	return nil
 }
 
