@@ -241,6 +241,8 @@ func getDeployer(o *options) (deployer, error) {
 		return noneDeploy{}, nil
 	case "local":
 		return newLocalCluster(), nil
+	case "azure":
+		return newAzure()
 	default:
 		return nil, fmt.Errorf("unknown deployment strategy %q", o.deployment)
 	}
