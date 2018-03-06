@@ -33,6 +33,7 @@ go_library(
         "none.go",
         "stage.go",
         "util.go",
+        "azure.go",
     ],
     importpath = "k8s.io/test-infra/kubetest",
     deps = [
