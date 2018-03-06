@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/azure-sdk-for-go-samples/resources"
+	"github.com/Azure-Samples/azure-sdk-for-go-samples/resources"
 )
 
 var (
