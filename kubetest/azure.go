@@ -47,7 +47,14 @@ type azure struct {
 }
 
 func (az azure) createResourceGroup(ctx context.Context) error {
-	_, err := resources.CreateGroup(ctx, az.resourceGroupName)
+	groupsClient := resources.getGroupsClient()
+	log.Println(fmt.Sprintf("creating resource group '%s' on location: %v", az.resourceGroupName, az.location))
+	err := groupsClient.CreateOrUpdate(
+		ctx,
+		az.resourceGroupName,
+		resources.Group{
+			Location: to.StringPtr(az.location),
+		})
 	if err != nil {
 		return err
 	}
