@@ -17,6 +17,7 @@ go_library(
     name = "go_default_library",
     srcs = [
         "anywhere.go",
+        "azure.go",
         "bash.go",
         "build.go",
         "dump.go",
