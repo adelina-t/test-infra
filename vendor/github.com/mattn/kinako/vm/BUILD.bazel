@@ -1,0 +1,29 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "env.go",
+        "vm.go",
+    ],
+    importpath = "github.com/mattn/kinako/vm",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/mattn/kinako/ast:go_default_library",
+        "//vendor/github.com/mattn/kinako/parser:go_default_library",
+    ],
+)
+
+filegroup(
+    name = "package-srcs",
+    srcs = glob(["**"]),
+    tags = ["automanaged"],
+    visibility = ["//visibility:private"],
+)
+
+filegroup(
+    name = "all-srcs",
+    srcs = [":package-srcs"],
+    tags = ["automanaged"],
+    visibility = ["//visibility:public"],
+)

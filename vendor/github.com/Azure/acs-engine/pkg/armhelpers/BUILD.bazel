@@ -1,0 +1,67 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "azureclient.go",
+        "compute.go",
+        "deploymentError.go",
+        "deploymentOperations.go",
+        "deployments.go",
+        "disk.go",
+        "graph.go",
+        "groupsclient.go",
+        "interfaces.go",
+        "kubeclient.go",
+        "mockclients.go",
+        "network.go",
+        "providers.go",
+        "storage.go",
+    ],
+    importpath = "github.com/Azure/acs-engine/pkg/armhelpers",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/Azure/acs-engine/pkg/acsengine:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/api:go_default_library",
+        "//vendor/github.com/Azure/azure-sdk-for-go/arm/authorization:go_default_library",
+        "//vendor/github.com/Azure/azure-sdk-for-go/arm/compute:go_default_library",
+        "//vendor/github.com/Azure/azure-sdk-for-go/arm/disk:go_default_library",
+        "//vendor/github.com/Azure/azure-sdk-for-go/arm/graphrbac:go_default_library",
+        "//vendor/github.com/Azure/azure-sdk-for-go/arm/network:go_default_library",
+        "//vendor/github.com/Azure/azure-sdk-for-go/arm/resources/resources:go_default_library",
+        "//vendor/github.com/Azure/azure-sdk-for-go/arm/resources/subscriptions:go_default_library",
+        "//vendor/github.com/Azure/azure-sdk-for-go/arm/storage:go_default_library",
+        "//vendor/github.com/Azure/azure-sdk-for-go/storage:go_default_library",
+        "//vendor/github.com/Azure/go-autorest/autorest:go_default_library",
+        "//vendor/github.com/Azure/go-autorest/autorest/adal:go_default_library",
+        "//vendor/github.com/Azure/go-autorest/autorest/azure:go_default_library",
+        "//vendor/github.com/Azure/go-autorest/autorest/date:go_default_library",
+        "//vendor/github.com/Azure/go-autorest/autorest/to:go_default_library",
+        "//vendor/github.com/mitchellh/go-homedir:go_default_library",
+        "//vendor/github.com/satori/go.uuid:go_default_library",
+        "//vendor/github.com/sirupsen/logrus:go_default_library",
+        "//vendor/k8s.io/api/core/v1:go_default_library",
+        "//vendor/k8s.io/api/policy/v1beta1:go_default_library",
+        "//vendor/k8s.io/apimachinery/pkg/api/errors:go_default_library",
+        "//vendor/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
+        "//vendor/k8s.io/apimachinery/pkg/fields:go_default_library",
+        "//vendor/k8s.io/apimachinery/pkg/util/wait:go_default_library",
+        "//vendor/k8s.io/client-go/kubernetes:go_default_library",
+        "//vendor/k8s.io/client-go/tools/clientcmd:go_default_library",
+        "//vendor/k8s.io/client-go/tools/clientcmd/api:go_default_library",
+    ],
+)
+
+filegroup(
+    name = "package-srcs",
+    srcs = glob(["**"]),
+    tags = ["automanaged"],
+    visibility = ["//visibility:private"],
+)
+
+filegroup(
+    name = "all-srcs",
+    srcs = [":package-srcs"],
+    tags = ["automanaged"],
+    visibility = ["//visibility:public"],
+)

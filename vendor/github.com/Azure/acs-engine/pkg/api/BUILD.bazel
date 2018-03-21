@@ -1,0 +1,59 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "apiloader.go",
+        "const.go",
+        "converterfromagentpoolonlyapi.go",
+        "converterfromapi.go",
+        "convertertoagentpoolonlyapi.go",
+        "convertertoapi.go",
+        "doc.go",
+        "orchestrators.go",
+        "strictjson.go",
+        "types.go",
+    ],
+    importpath = "github.com/Azure/acs-engine/pkg/api",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/Azure/acs-engine/pkg/api/agentPoolOnlyApi/v20170831:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/agentPoolOnlyApi/vlabs:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/common:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/v20160330:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/v20160930:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/v20170131:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/v20170701:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/v20170930:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/vlabs:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/helpers:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/i18n:go_default_library",
+        "//vendor/github.com/Masterminds/semver:go_default_library",
+        "//vendor/github.com/sirupsen/logrus:go_default_library",
+    ],
+)
+
+filegroup(
+    name = "package-srcs",
+    srcs = glob(["**"]),
+    tags = ["automanaged"],
+    visibility = ["//visibility:private"],
+)
+
+filegroup(
+    name = "all-srcs",
+    srcs = [
+        ":package-srcs",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/agentPoolOnlyApi/v20170831:all-srcs",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/agentPoolOnlyApi/vlabs:all-srcs",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/common:all-srcs",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/v20160330:all-srcs",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/v20160930:all-srcs",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/v20170131:all-srcs",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/v20170701:all-srcs",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/v20170930:all-srcs",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/vlabs:all-srcs",
+    ],
+    tags = ["automanaged"],
+    visibility = ["//visibility:public"],
+)

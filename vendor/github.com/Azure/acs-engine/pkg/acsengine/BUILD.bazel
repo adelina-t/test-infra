@@ -1,0 +1,59 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "addons.go",
+        "azureconst.go",
+        "const.go",
+        "defaults.go",
+        "defaults-apiserver.go",
+        "defaults-cloud-controller-manager.go",
+        "defaults-controller-manager.go",
+        "defaults-kubelet.go",
+        "doc.go",
+        "engine.go",
+        "fileloader.go",
+        "filesaver.go",
+        "k8s_versions.go",
+        "output.go",
+        "pki.go",
+        "ssh.go",
+        "tenantid.go",
+	"templates.go",
+        "types.go",
+    ],
+    importpath = "github.com/Azure/acs-engine/pkg/acsengine",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/Azure/acs-engine/pkg/api:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/common:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/v20160330:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/api/vlabs:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/helpers:go_default_library",
+        "//vendor/github.com/Azure/acs-engine/pkg/i18n:go_default_library",
+        "//vendor/github.com/Azure/azure-sdk-for-go/arm/resources/subscriptions:go_default_library",
+        "//vendor/github.com/Azure/go-autorest/autorest/azure:go_default_library",
+        "//vendor/github.com/Masterminds/semver:go_default_library",
+        "//vendor/github.com/ghodss/yaml:go_default_library",
+        "//vendor/github.com/sirupsen/logrus:go_default_library",
+        "//vendor/golang.org/x/crypto/ssh:go_default_library",
+    ],
+)
+
+filegroup(
+    name = "package-srcs",
+    srcs = glob(["**"]),
+    tags = ["automanaged"],
+    visibility = ["//visibility:private"],
+)
+
+filegroup(
+    name = "all-srcs",
+    srcs = [
+        ":package-srcs",
+        "//vendor/github.com/Azure/acs-engine/pkg/acsengine/transform:all-srcs",
+    ],
+    tags = ["automanaged"],
+    visibility = ["//visibility:public"],
+)

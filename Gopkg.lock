@@ -20,6 +20,56 @@
   version = "v0.17.0"
 
 [[projects]]
+  branch = "bump_6.0.0"
+  name = "github.com/Azure/acs-engine"
+  packages = [
+    "pkg/acsengine",
+    "pkg/acsengine/transform",
+    "pkg/api",
+    "pkg/api/agentPoolOnlyApi/v20170831",
+    "pkg/api/agentPoolOnlyApi/vlabs",
+    "pkg/api/common",
+    "pkg/api/v20160330",
+    "pkg/api/v20160930",
+    "pkg/api/v20170131",
+    "pkg/api/v20170701",
+    "pkg/api/v20170930",
+    "pkg/api/vlabs",
+    "pkg/armhelpers",
+    "pkg/helpers",
+    "pkg/i18n",
+  ]
+  revision = "bba9f1eecd628dda25b264f0bb255f95e2ec50b0"
+  source = "github.com/adelina-t/acs-engine"
+
+[[projects]]
+  name = "github.com/Azure/azure-sdk-for-go"
+  packages = [
+    "arm/authorization",
+    "arm/compute",
+    "arm/disk",
+    "arm/graphrbac",
+    "arm/network",
+    "arm/resources/resources",
+    "arm/resources/subscriptions",
+    "arm/storage",
+    "storage",
+  ]
+  revision = "5b6066bbd213e47c49a5fa2be2b29529bbcb6704"
+
+[[projects]]
+  name = "github.com/Azure/go-autorest"
+  packages = [
+    "autorest",
+    "autorest/adal",
+    "autorest/azure",
+    "autorest/date",
+    "autorest/to",
+    "autorest/validation",
+  ]
+  revision = "f6e08fe5e4d45c9a66e40196d3fed5f37331d224"
+
+[[projects]]
   branch = "parse-constraints-with-dash-in-pre"
   name = "github.com/Masterminds/semver"
   packages = ["."]
@@ -136,6 +186,12 @@
   revision = "9ce5d979ffdaca6385988d7ad1079a33ec942d20"
 
 [[projects]]
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
+
+[[projects]]
   name = "github.com/djherbis/atime"
   packages = ["."]
   revision = "8e47e0e01d08df8b9f840d74299c8ab70a024a30"
@@ -238,6 +294,21 @@
   name = "github.com/go-openapi/swag"
   packages = ["."]
   revision = "cf0bdb963811675a4d7e74901cefc7411a1df939"
+
+[[projects]]
+  name = "github.com/go-playground/locales"
+  packages = [
+    ".",
+    "currency",
+  ]
+  revision = "e4cbcb5d0652150d40ad0646651076b6bd2be4f6"
+  version = "v0.11.2"
+
+[[projects]]
+  name = "github.com/go-playground/universal-translator"
+  packages = ["."]
+  revision = "b32fa301c9fe55953584134cb6853a13c87ec0a1"
+  version = "v0.16.0"
 
 [[projects]]
   name = "github.com/go-sql-driver/mysql"
@@ -438,6 +509,12 @@
   version = "1.0.1"
 
 [[projects]]
+  name = "github.com/leonelquinteros/gotext"
+  packages = ["."]
+  revision = "92b69ffa4cc0895b83b42f50065e9de5a3c32960"
+  version = "v1.3.1"
+
+[[projects]]
   branch = "master"
   name = "github.com/mailru/easyjson"
   packages = [
@@ -453,9 +530,25 @@
   revision = "38ee283dabf11c9cbdb968eebd79b1fa7acbabe6"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/mattn/kinako"
+  packages = [
+    "ast",
+    "parser",
+    "vm",
+  ]
+  revision = "332c0a7e205a29536e672337a4bea6c7a96b04c1"
+
+[[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
   packages = ["pbutil"]
   revision = "fc2b8d3a73c4867e51861bbdd5ae3c1f0869dd6a"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  revision = "b8bc1bf767474819792c23f32d8286a45736f1c6"
 
 [[projects]]
   name = "github.com/modern-go/concurrent"
@@ -545,6 +638,12 @@
   name = "github.com/satori/go.uuid"
   packages = ["."]
   revision = "0aa62d5ddceb50dbcb909d790b5345affd3669b6"
+
+[[projects]]
+  name = "github.com/satori/uuid"
+  packages = ["."]
+  revision = "f58768cc1a7a7e77a3bd49e98cdd21419399b6a3"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -744,6 +843,12 @@
   version = "v1.9.2"
 
 [[projects]]
+  name = "gopkg.in/go-playground/validator.v9"
+  packages = ["."]
+  revision = "1b8c8e19cd250435025214492d9a08411d760fdd"
+  version = "v9.12.0"
+
+[[projects]]
   name = "gopkg.in/inf.v0"
   packages = ["."]
   revision = "3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4"
@@ -918,5 +1023,6 @@
   analyzer-name = "dep"
   analyzer-version = 1
   inputs-digest = "3227ee0b4f0931730ee667820ab4433f6352459f899fefe3cb6695afa07179f5"
+  inputs-digest = "5d91962e01a666ec35c145babca7c55f9b2c5642f796f9b789567a6676586e8e"
   solver-name = "gps-cdcl"
   solver-version = 1
