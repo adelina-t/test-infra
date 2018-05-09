@@ -20,6 +20,28 @@
   version = "v0.17.0"
 
 [[projects]]
+  name = "github.com/Azure/azure-sdk-for-go"
+  packages = [
+    "services/resources/mgmt/2017-05-10/resources",
+    "version",
+  ]
+  revision = "4650843026a7fdec254a8d9cf893693a254edd0b"
+  version = "v16.2.1"
+
+[[projects]]
+  name = "github.com/Azure/go-autorest"
+  packages = [
+    "autorest",
+    "autorest/adal",
+    "autorest/azure",
+    "autorest/date",
+    "autorest/to",
+    "autorest/validation",
+  ]
+  revision = "eaa7994b2278094c904d31993d26f56324db3052"
+  version = "v10.8.1"
+
+[[projects]]
   branch = "parse-constraints-with-dash-in-pre"
   name = "github.com/Masterminds/semver"
   packages = ["."]
@@ -164,6 +186,12 @@
   packages = ["."]
   revision = "1d4478f51bed434f1dadf96dcd9b43aabac66795"
   version = "v1.7"
+
+[[projects]]
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
 
 [[projects]]
   name = "github.com/djherbis/atime"
@@ -968,6 +996,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b7cd4091ef2023171dfbddb7325dab50faae32818ef830edb8bfa855d74545a6"
+  inputs-digest = "799cc48cc95a8a7279f8bc7fc816b111877463707145d7a7f31707efb90f8e37"
   solver-name = "gps-cdcl"
   solver-version = 1
