@@ -407,6 +407,10 @@ def set_up_aws(workspace, args, mode, cluster, runner_args):
     # TODO(krzyzacy):Remove after retire kops-e2e-runner.sh
     mode.add_aws_runner()
 
+def set_up_acsengine(mode):
+    kubectl_path = check_output('which','kubectl')
+    mode.add_environment('KUBECTL_PATH=%s' % kubectl_path)
+
 def read_gcs_path(gcs_path):
     """reads a gcs path (gs://...) by HTTP GET to storage.googleapis.com"""
     link = gcs_path.replace('gs://', 'https://storage.googleapis.com/')
@@ -566,6 +570,8 @@ def main(args):
         set_up_kops_aws(mode.workspace, args, mode, cluster, runner_args)
     elif args.deployment == 'kops' and args.provider == 'gce':
         set_up_kops_gce(mode.workspace, args, mode, cluster, runner_args)
+    elif args.deployment == 'acsengine' and args.provider == 'azure':
+        set_up_acsengine(mode)
     elif args.gce_ssh:
         mode.add_gce_ssh(args.gce_ssh, args.gce_pub)
 
