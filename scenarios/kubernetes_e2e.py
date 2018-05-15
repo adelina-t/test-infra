@@ -409,7 +409,7 @@ def set_up_aws(workspace, args, mode, cluster, runner_args):
 
 def set_up_acsengine(mode):
     kubectl_path = check_output('which','kubectl')
-    mode.add_environment('KUBECTL_PATH=%s' % kubectl_path)
+    #mode.add_environment('KUBECTL_PATH=%s' % kubectl_path)
 
 def read_gcs_path(gcs_path):
     """reads a gcs path (gs://...) by HTTP GET to storage.googleapis.com"""
