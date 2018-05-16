@@ -5,10 +5,6 @@ KUBEPATH=$GOPATH/src/k8s.io/kubernetes
 DIST_DIR=$HOME/k
 ZIP_PATH=$1
 
-echo $ZIP_PATH
-echo "Dummy script for test"
-exit 0
-
 mkdir -p $DIST_DIR
 
 $KUBEPATH/build/run.sh make WHAT=cmd/kubelet KUBE_BUILD_PLATFORMS=linux/amd64

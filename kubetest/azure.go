@@ -26,6 +26,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"net/url"
 	"path"
 	"strings"
 	"time"
@@ -372,30 +373,30 @@ func (c Cluster) uploadZip(zipPath string) error {
 
 	containerURL := azblob.NewContainerURL(*URL, p)
 
-	blobURL := containerURL.NewBlockBlobURL("goBlob")
+	blobURL := containerURL.NewBlockBlobURL("v1.0int.zip")
 	file, _ := os.Open(zipPath)
 	_, err := azblob.UploadFileToBlockBlob(context.Background(), file, blobURL, azblob.UploadToBlockBlobOptions{})
 	if err != nil {
-		return
+		return err
 	}
 	return nil
 }
 
-func buildWinZip() error {
+func (c Cluster) buildWinZip() error {
 
 	zip_path := path.Join(os.Getenv("HOME"),"v1.0int.zip")
 	build_script_path := path.Join(os.Getenv("GOPATH"),"src","k8s.io", "test-infra","kubetest","build-win.sh")
         if err := control.FinishRunning(exec.Command(build_script_path, zip_path)); err != nil {
 		return err
 	}
-        if err :=uploadZip(zip_path) ; err != nil {
+        if err := c.uploadZip(zip_path) ; err != nil {
 		return err
 	}
 	return nil
 }
 
 func (c Cluster) Up() error {
-	err := buildWinZip()
+	err := c.buildWinZip()
         if err != nil {
 		return fmt.Errorf("Problem building hyperkube %v", err)
  	}
