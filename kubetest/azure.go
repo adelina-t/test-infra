@@ -34,6 +34,7 @@ import (
 
 	"github.com/Azure/go-autorest/autorest/azure"
 	"github.com/satori/go.uuid"
+        "github.com/Azure/azure-storage-blob-go/2016-05-31/azblob"
 )
 
 var (
@@ -61,6 +62,8 @@ type Creds struct {
 	ClientSecret   string
 	TennantID      string
 	SubscriptionId string
+        StorageAccountName string
+        StorageAccountKey string
 }
 
 type Config struct {
@@ -336,8 +339,67 @@ func (c *Cluster) createCluster() error {
 
 }
 
+func buildHyperKube() error {
+        docker_user := os.Getenv("DOCKER_USER")
+        docker_pass := os.Getenv("DOCKER_PASS")
+        username :=  "--username=" + docker_user
+        password :=  "--password=" + docker_pass
+        if err := control.FinishRunning(exec.Command("docker","login",username,password)); err != nil {
+                return err
+        }
+
+	os.Setenv("VERSION", "1.1")
+        os.Setenv("REGISTRY", "atuvenie")
+        cwd, _ := os.Getwd()
+        log.Printf("CWD %v", cwd)
+	if err := control.FinishRunning(exec.Command("hack/dev-push-hyperkube.sh")); err != nil {
+                return err
+        }
+	return nil
+}
+
+func (c Cluster) uploadZip(zipPath string) error {
+
+//	var accountName string = "k8szipstorage"
+//	var accountKey string = "sLDa0vyBO39sGi4KHpZkTANLw1lRd3GikI2G/3xrdJ0C8v0XDdlpeFWjbljIxTcfAXgiQnOVTaLYztCbbP72SQ=="
+	credential := azblob.NewSharedKeyCredential(c.credentials.StorageAccountName, c.credentials.StorageAccountKey)
+	p := azblob.NewPipeline(credential, azblob.PipelineOptions{})
+
+	var containerName string = "mystoragecontainer"
+
+	URL, _ := url.Parse(
+		fmt.Sprintf("https://%s.blob.core.windows.net/%s", c.credentials.StorageAccountName, containerName))
+
+	containerURL := azblob.NewContainerURL(*URL, p)
+
+	blobURL := containerURL.NewBlockBlobURL("goBlob")
+	file, _ := os.Open(zipPath)
+	_, err := azblob.UploadFileToBlockBlob(context.Background(), file, blobURL, azblob.UploadToBlockBlobOptions{})
+	if err != nil {
+		return
+	}
+	return nil
+}
+
+func buildWinZip() error {
+
+	zip_path := path.Join(os.Getenv("HOME"),"v1.0int.zip")
+	build_script_path := path.Join(os.Getenv("GOPATH"),"src","k8s.io", "test-infra","kubetest","build-win.sh")
+        if err := control.FinishRunning(exec.Command(build_script_path, zip_path)); err != nil {
+		return err
+	}
+        if err :=uploadZip(zip_path) ; err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c Cluster) Up() error {
-	var err error
+	err := buildWinZip()
+        if err != nil {
+		return fmt.Errorf("Problem building hyperkube %v", err)
+ 	}
+/*	var err error
 	if c.apiModelPath == "" {
 		err = c.generateTemplate()
 		if err != nil {
@@ -360,13 +422,14 @@ func (c Cluster) Up() error {
 	if err != nil {
 		return fmt.Errorf("Error creating cluster: %v", err)
 	}
-
+*/
 	return nil
 }
 
 func (c Cluster) Down() error {
 	log.Printf("Deleting resource group: %v.", c.resourceGroup)
-	return c.azureClient.DeleteResourceGroup(c.ctx, c.resourceGroup)
+//	return c.azureClient.DeleteResourceGroup(c.ctx, c.resourceGroup)
+	return nil
 }
 
 func (c Cluster) DumpClusterLogs(localPath, gcsPath string) error {
