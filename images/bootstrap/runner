@@ -18,7 +18,15 @@ set -o nounset
 set -o pipefail
 
 # get test-infra for latest bootstrap etc
-git clone https://github.com/kubernetes/test-infra
+echo "adelina-t cherry-pick"
+git clone https://github.com/adelina-t/test-infra
+cd test-infra
+git fetch -a
+git checkout add_azure_provider_to_kubernetes_e2e_scenario
+pwd
+git branch
+git show
+cd ../
 
 
 # Check if the job has opted-in to bazel remote caching and if so generate 
@@ -72,7 +80,7 @@ set +o errexit
 ./test-infra/jenkins/bootstrap.py \
     --job=${JOB_NAME} \
     --service-account=${GOOGLE_APPLICATION_CREDENTIALS} \
-    --upload='gs://kubernetes-jenkins/logs' \
+    --upload='gs://win-e2e-test/logs' \
     "$@"
 EXIT_VALUE=$?
 

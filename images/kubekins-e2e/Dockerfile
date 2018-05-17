@@ -15,7 +15,7 @@
 # This file creates a build environment for building and running kubernetes
 # unit and integration tests
 
-FROM gcr.io/k8s-testimages/bootstrap:v20180510-809cd85b5
+FROM atuvenie/bootstrap:1.0
 LABEL maintainer "Sen Lu <senlu@google.com>"
 
 # hint to kubetest that it is in CI
@@ -67,11 +67,13 @@ RUN INSTALLER="bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"; \
 # add env we can debug with the image name:tag
 ARG IMAGE_ARG
 ENV IMAGE=${IMAGE_ARG}
-
+ENV KUBECONFIG=/workspace/kubeconfig.eastus.json
 # everything below will be triggered on every new image tag ...
-ADD ["e2e-runner.sh", \
+ADD ["kubeconfig.eastus.json", \
+    "e2e-runner.sh", \
     "kops-e2e-runner.sh", \
     "kubetest", \
     "https://raw.githubusercontent.com/kubernetes/kubernetes/master/cluster/get-kube.sh", \
     "/workspace/"]
 RUN ["chmod", "+x", "/workspace/get-kube.sh"]
+RUN readlink -f kubeconfig.eastus.json

@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMG = gcr.io/k8s-testimages/bootstrap
-TAG = $(shell date +v%Y%m%d)-$(shell git describe --tags --always --dirty)
+IMG = atuvenie/bootstrap
+TAG = 1.0
 
 all: build
 

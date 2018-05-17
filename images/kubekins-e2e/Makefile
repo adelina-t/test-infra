@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMG = gcr.io/k8s-testimages/kubekins-e2e
-TAG = $(shell date +v%Y%m%d)-$(shell git describe --tags --always --dirty)
+IMG = atuvenie/kubekins-e2e
+TAG = 1.0
 
 # kubernetes master branch config
 K8S ?= master
@@ -59,8 +59,10 @@ all: build
 
 kubetest:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o kubetest ../../kubetest
+	bazel build //kubetest
+	cp ../../bazel-bin/kubetest/linux_amd64_stripped/kubetest .
 
-build: kubetest
+build: #kubetest
 	@echo Building with go:$(GO) and bazel:$(BAZEL)
 	docker build --build-arg GO_VERSION=$(GO) --build-arg BAZEL_VERSION=$(BAZEL) --build-arg CFSSL_VERSION=$(CFSSL) --build-arg IMAGE_ARG=$(IMG):$(TAG)-$(K8S) -t $(IMG):$(TAG)-$(K8S) .
 	docker tag $(IMG):$(TAG)-$(K8S) $(IMG):latest-$(K8S)
