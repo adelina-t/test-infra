@@ -259,7 +259,7 @@ func getDeployer(o *options) (deployer, error) {
 	case "local":
 		return newLocalCluster(), nil
 	case "acsengine":
-		return newAzure()
+		return newAcsEngine()
 	default:
 		return nil, fmt.Errorf("unknown deployment strategy %q", o.deployment)
 	}
@@ -697,7 +697,7 @@ func prepareGcp(o *options) error {
 		if hasGCPImageFamily && hasGCPImageProject {
 			out, err := control.Output(exec.Command("gcloud", "compute", "images", "describe-from-family", o.gcpImageFamily, "--project", o.gcpImageProject))
 			if err != nil {
-				return fmt.Errorf("failed to get latest image from family %q in project %q: %s", o.gcpImageFamily, o.gcpImageProject, err)
+				return fmt.Errorf("failed to latest image from family %q in project %q: %s", o.gcpImageFamily, o.gcpImageProject, err)
 			}
 			latestImage := ""
 			latestImageRegexp := regexp.MustCompile("^name: *(\\S+)")

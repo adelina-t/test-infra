@@ -72,8 +72,9 @@ type KubernetesConfig struct {
 	CustomHyperkubeImage    string `json:"customHyperkubeImage,omitempty"`
 }
 type OrchestratorProfile struct {
-	OrchestratorType string            `json:"orchestratorType"`
-	KubernetesConfig *KubernetesConfig `json:"kubernetesConfig,omitempty"`
+	OrchestratorType    string            `json:"orchestratorType"`
+	OrchestratorRelease string            `json:"orchestratorRelease"`
+	KubernetesConfig    *KubernetesConfig `json:"kubernetesConfig,omitempty"`
 }
 
 type MasterProfile struct {
