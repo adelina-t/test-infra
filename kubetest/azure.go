@@ -56,9 +56,10 @@ var (
 	acsEngineMD5           = flag.String("acsengine-md5-sum", "", "Checksum for acs engine download")
 	acsSSHPublicKeyPath    = flag.String("acsengine-public-key", "", "Path to SSH Public Key")
 	acsWinBinariesURL      = flag.String("acsengine-win-binaries-url", "", "Path to get the zip file containing kubelet and kubeproxy binaries for Windows")
-	acsHyperKubeURL        = flag.String("acsengine-hypercube-url", "", "Path to get the kyberkube image for the deployment")
+	acsHyperKubeURL        = flag.String("acsengine-hyperkube-url", "", "Path to get the kyberkube image for the deployment")
 	acsCredentialsFile     = flag.String("acsengine-creds", "", "Path to credential file for Azure")
 	acsOrchestratorRelease = flag.String("acsengine-orchestratorRelease", "1.11", "Orchestrator Profile for acs-engine")
+	acsWinZipBuildScript   = flag.String("acsengine-winZipBuildScript", "https://raw.githubusercontent.com/Azure/acs-engine/master/scripts/build-windows-k8s.sh", "Build script to create custom zip containing win binaries for acs-engine")
 )
 
 type Creds struct {
@@ -98,6 +99,7 @@ type Cluster struct {
 
 func (c *Cluster) getAzCredentials() error {
 	content, err := ioutil.ReadFile(*acsCredentialsFile)
+	log.Printf("Reading credentials file %v", *acsCredentialsFile)
 	if err != nil {
 		return fmt.Errorf("Error reading credentials file %v %v", *acsCredentialsFile, err)
 	}
@@ -369,8 +371,8 @@ func (c *Cluster) buildHyperKube() error {
 	if err := control.FinishRunning(exec.Command("docker", "login", fmt.Sprintf("--username=%s", docker_user), fmt.Sprintf("--password=%s", docker_pass))); err != nil {
 		return err
 	}
-
-	os.Setenv("VERSION", os.Getenv("KUBE_GIT_VERSION"))
+	// version ramane de setat aici, registry config.yaml
+	os.Setenv("VERSION", os.Getenv("BUILD_NUMBER"))
 	os.Setenv("REGISTRY", "atuvenie")
 	// script only needs check that envs are set
 
@@ -397,12 +399,15 @@ func (c *Cluster) uploadZip(zipPath string) error {
 		fmt.Sprintf("https://%s.blob.core.windows.net/%s", c.credentials.StorageAccountName, containerName))
 
 	containerURL := azblob.NewContainerURL(*URL, p)
-	file, _ := os.Open(zipPath)
-	blobURL := containerURL.NewBlockBlobURL(filepath.Base(file.Name()))
-	_, err := azblob.UploadFileToBlockBlob(context.Background(), file, blobURL, azblob.UploadToBlockBlobOptions{})
-	file.Close()
+	file, err := os.Open(zipPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("Failed to open file %v . Error $v", zipPath, err)
+	}
+	blobURL := containerURL.NewBlockBlobURL(filepath.Base(file.Name()))
+	_, err1 := azblob.UploadFileToBlockBlob(context.Background(), file, blobURL, azblob.UploadToBlockBlobOptions{})
+	file.Close()
+	if err1 != nil {
+		return err1
 	}
 	blob_url := blobURL.URL()
 	c.acsCustomWinBinariesURL = blob_url.String()
@@ -411,14 +416,44 @@ func (c *Cluster) uploadZip(zipPath string) error {
 	return nil
 }
 
+func getZipBuildScript(buildScriptUrl string, retry int) (string, error) {
+	downloadPath := path.Join(os.Getenv("HOME"), "build-win-zip.sh")
+	f, err := os.Create(downloadPath)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	for i := 0; i < retry; i++ {
+		log.Printf("downloading %v from %v.", downloadPath, buildScriptUrl)
+		if err := httpRead(buildScriptUrl, f); err == nil {
+			break
+		}
+		err = fmt.Errorf("url=%s failed get %v: %v.", buildScriptUrl, downloadPath, err)
+		if i == retry-1 {
+			return "", err
+		}
+		log.Println(err)
+		sleep(time.Duration(i) * time.Second)
+	}
+	f.Chmod(0744)
+	return downloadPath, nil
+}
+
 func (c *Cluster) buildWinZip() error {
 
-	zip_name := fmt.Sprintf("%s.zip", os.Getenv("KUBE_GIT_VERSION"))
+	zip_name := fmt.Sprintf("%s.zip", os.Getenv("BUILD_NUMBER"))
+	build_folder := path.Join(os.Getenv("HOME"), "winbuild")
 	zip_path := path.Join(os.Getenv("HOME"), zip_name)
-	build_script_path := path.Join(os.Getenv("GOPATH"), "src", "k8s.io", "test-infra", "kubetest", "build-win.sh")
-	if err := control.FinishRunning(exec.Command(build_script_path, zip_path)); err != nil {
+	log.Printf("Building %s", zip_name)
+	build_script_path, err := getZipBuildScript(*acsWinZipBuildScript, 2)
+	if err != nil {
 		return err
 	}
+	if err := control.FinishRunning(exec.Command(build_script_path, "-u", zip_name, "-z", build_folder)); err != nil {
+		return err
+	}
+	log.Printf("Uploading %s", zip_path)
 	if err := c.uploadZip(zip_path); err != nil {
 		return err
 	}
@@ -428,13 +463,17 @@ func (c *Cluster) buildWinZip() error {
 func (c Cluster) Up() error {
 
 	var err error
-	err = c.buildHyperKube()
-	if err != nil {
-		return fmt.Errorf("Problem building hyperkube %v", err)
+	if *acsHyperKubeURL == "" {
+		err = c.buildHyperKube()
+		if err != nil {
+			return fmt.Errorf("Problem building hyperkube %v", err)
+		}
 	}
-	err = c.buildWinZip()
-	if err != nil {
-		return fmt.Errorf("Problem building windowsZipFile %v", err)
+	if *acsWinBinariesURL == "" {
+		err = c.buildWinZip()
+		if err != nil {
+			return fmt.Errorf("Problem building windowsZipFile %v", err)
+		}
 	}
 	if c.apiModelPath == "" {
 		err = c.generateTemplate()
@@ -442,7 +481,7 @@ func (c Cluster) Up() error {
 			return fmt.Errorf("Failed to generate apiModel: %v", err)
 		}
 	}
-	err = c.getAcsEngine(1)
+	err = c.getAcsEngine(2)
 	if err != nil {
 		return fmt.Errorf("Failed to get ACS Engine binary: %v", err)
 	}
@@ -450,6 +489,7 @@ func (c Cluster) Up() error {
 	if err != nil {
 		return fmt.Errorf("Failed to generate ARM templates: %v", err)
 	}
+	return nil
 	err = c.loadARMTemplates()
 	if err != nil {
 		return fmt.Errorf("Error loading ARM templates: %v", err)
