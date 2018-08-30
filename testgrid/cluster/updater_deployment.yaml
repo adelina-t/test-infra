@@ -19,7 +19,7 @@ spec:
         image: gcr.io/fejta-prod/testgrid/updater:latest
         imagePullPolicy: Always
         args:
-        - --config=gs://fejternetes/config
+        - --config=gs://win-e2e-test/config
         - --gcp-service-account=/etc/gcp/service-account.json
         #- --confirm
         volumeMounts:

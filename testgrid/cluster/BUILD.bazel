@@ -26,14 +26,12 @@ k8s_objects(
 )
 
 # TODO(fejta): move to variable and figure out real values
-CLUSTER = "gke_fejta-prod_us-central1-f_erick"
 
 ROOT = "gcr.io/fejta-prod/testgrid"
 
 # TODO(fejta): wrap this in a rule like for prow
 k8s_object(
     name = "updater",
-    cluster = CLUSTER,
     image_chroot = ROOT,
     images = {
         ROOT + "/updater:latest": "//testgrid/images:updater",
@@ -45,7 +43,6 @@ k8s_object(
 
 k8s_object(
     name = "configurator",
-    cluster = CLUSTER,
     image_chroot = ROOT,
     images = {
         ROOT + "/configurator:latest": "//testgrid/images:configurator",
@@ -57,7 +54,6 @@ k8s_object(
 
 k8s_configmap(
     name = "testgrid-config",
-    cluster = CLUSTER,
     data = {
         "config.yaml": "//testgrid:config-yaml",
     },

@@ -23,8 +23,8 @@ package(default_visibility = ["//testgrid:__subpackages__"])
 docker_bundle(
     name = "images",
     images = tags(**{
-        "gcr.io/fejta-prod/testgrid/updater": ":updater",
-        "gcr.io/fejta-prod/testgrid/configurator": ":configurator",
+        "gcr.io/win-e2e-test/testgrid/updater": ":updater",
+        "gcr.io/win-e2e-test/testgrid/configurator": ":configurator",
     }),
     stamp = True,
 )
