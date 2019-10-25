@@ -18,7 +18,7 @@ set -o nounset
 set -o pipefail
 
 # get test-infra for latest bootstrap etc
-git clone https://github.com/kubernetes/test-infra
+git clone --branch remote_repo_bootstrap https://github.com/adelina-t/test-infra
 
 # actually start bootstrap and the job, under the runner (which handles dind etc.)
 /usr/local/bin/runner.sh \
